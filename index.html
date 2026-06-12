@@ -533,10 +533,9 @@ const SCHOOL_NAME = "Cao Đẳng Viễn Đông";
 const SCHOOL_YEAR = "2026 – 2027";
 const PASS_SCORE  = 15; // cập nhật khi có điểm chuẩn chính thức
 
-// ── Thanh Niên API ────────────────────────────────────────────
-// Token không được validate phía server — không cần quản lý
-const API_LOP10 = "https://thanhnien.vn/api/diem-thi-lop-10.htm";
-const API_THPT  = "https://thanhnien.vn/api/get-data-tuyen-sinh.htm";
+// ── API proxy (Vercel serverless — thêm Referer header phía server) ──
+const API_LOP10 = "/api/tracuu";
+const API_THPT  = "/api/tracuu";
 
 // ── Init ─────────────────────────────────────────────────────
 document.getElementById('hdr-school').textContent    = SCHOOL_NAME;
@@ -752,12 +751,12 @@ async function search() {
         }
         if (invalid.length) { shakeInvalid(invalid); showToast('Vui lòng nhập đầy đủ số báo danh, họ tên và ngày sinh!'); return; }
         url    = API_LOP10;
-        params = new URLSearchParams({ keywords: sbd, name: ten, birthday: dob, sitename: 'thanhnien' });
+        params = new URLSearchParams({ keywords: sbd, name: ten, birthday: dob, sitename: 'thanhnien', _endpoint: 'lop10' });
     } else {
         const sbd = document.getElementById('thpt-sbd').value.trim();
         if (!sbd) { shakeInvalid(['thpt-sbd']); showToast('Vui lòng nhập số báo danh!'); return; }
         url    = API_THPT;
-        params = new URLSearchParams({ keywords: sbd, pageindex: 1, size: 10, type: 3 });
+        params = new URLSearchParams({ keywords: sbd, pageindex: 1, size: 10, type: 3, _endpoint: 'thpt' });
     }
 
     try {
