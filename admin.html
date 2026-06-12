@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nhập Điểm – Admin</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+    --blue: #1a5276; --blue-l: #2980b9;
+    --green: #1e8449; --red: #c0392b;
+    --gold: #d4a017;
+    --bg: #eef2f7; --card: #fff;
+    --text: #1c2833; --muted: #717d7e; --border: #d5d8dc;
+}
+body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); }
+
+header {
+    background: linear-gradient(135deg, #0d2b4e, #1a5276);
+    color: white; padding: 1.3rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+}
+header h1 { font-size: 1.2rem; font-weight: 800; }
+header p  { font-size: 0.82rem; opacity: 0.8; }
+
+main { max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; }
+
+.card { background: var(--card); border-radius: 14px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
+.card h2 { font-size: 0.95rem; font-weight: 700; color: var(--blue); margin-bottom: 1.2rem; }
+
+/* Config row */
+.cfg-row { display: flex; flex-wrap: wrap; gap: 1rem; }
+.cfg-group { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 180px; }
+.cfg-group label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+.cfg-group input {
+    padding: 0.55rem 0.8rem; border: 2px solid var(--border); border-radius: 8px;
+    font-size: 0.9rem; font-family: inherit; outline: none;
+}
+.cfg-group input:focus { border-color: var(--blue-l); }
+
+/* Toolbar */
+.toolbar { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1rem; }
+button {
+    padding: 0.55rem 1.1rem; border: none; border-radius: 8px;
+    font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: inherit;
+    transition: opacity 0.15s, transform 0.1s;
+}
+button:hover { opacity: 0.85; transform: translateY(-1px); }
+button:active { transform: translateY(0); }
+.btn-green  { background: var(--green); color: white; }
+.btn-blue   { background: var(--blue); color: white; }
+.btn-gold   { background: var(--gold); color: white; }
+.btn-red    { background: var(--red); color: white; }
+.btn-gray   { background: #85929e; color: white; }
+
+/* Table */
+.tbl-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+thead tr { background: var(--blue); color: white; }
+thead th { padding: 0.7rem 0.6rem; text-align: left; font-weight: 600; white-space: nowrap; }
+tbody tr:nth-child(even) { background: #f7f9fc; }
+tbody tr:hover { background: #eaf0f8; }
+td { padding: 0.3rem 0.4rem; vertical-align: middle; }
+td input {
+    width: 100%; padding: 0.35rem 0.5rem;
+    border: 1.5px solid transparent; border-radius: 6px;
+    font-size: 0.88rem; font-family: inherit;
+    background: transparent; outline: none;
+}
+td input:focus { border-color: var(--blue-l); background: white; }
+.col-del { width: 38px; text-align: center; }
+.del-btn {
+    background: none; border: none; color: #c0392b; cursor: pointer;
+    font-size: 1.1rem; padding: 0; line-height: 1;
+    transform: none;
+}
+.del-btn:hover { color: #922b21; transform: none; }
+.col-num { width: 36px; text-align: center; color: var(--muted); font-size: 0.8rem; }
+.total-cell { font-weight: 700; color: var(--blue); }
+
+/* Output */
+#out-wrap { display: none; }
+textarea {
+    width: 100%; height: 340px; border: 2px solid var(--border); border-radius: 10px;
+    padding: 1rem; font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 0.82rem; resize: vertical; outline: none; color: var(--text);
+}
+textarea:focus { border-color: var(--blue-l); }
+.hint { font-size: 0.82rem; color: var(--muted); margin-top: 0.6rem; line-height: 1.5; }
+
+/* Stats bar */
+.stats { display: flex; flex-wrap: wrap; gap: 1.2rem; font-size: 0.85rem; color: var(--muted); }
+.stat strong { color: var(--text); }
+
+/* Flash */
+.flash {
+    position: fixed; top: 1rem; right: 1rem; z-index: 999;
+    background: var(--green); color: white; padding: 0.7rem 1.3rem;
+    border-radius: 10px; font-weight: 600; font-size: 0.9rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    animation: flashIn 0.25s ease;
+}
+@keyframes flashIn { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform:none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Công Cụ Nhập Điểm</h1>
+    <p>Chỉ dùng nội bộ — Tuyển sinh vào lớp 10</p>
+  </div>
+  <div style="font-size:0.8rem;opacity:0.75">Dữ liệu lưu tạm trong trình duyệt</div>
+</header>
+
+<main>
+
+<!-- Cấu hình -->
+<div class="card">
+  <h2>Cấu hình</h2>
+  <div class="cfg-row">
+    <div class="cfg-group">
+      <label>Tên trường</label>
+      <input type="text" id="cfg-school" value="Trường THPT Viễn Đông" oninput="saveCfg()">
+    </div>
+    <div class="cfg-group">
+      <label>Năm học</label>
+      <input type="text" id="cfg-year" value="2026 – 2027" oninput="saveCfg()">
+    </div>
+    <div class="cfg-group">
+      <label>Điểm chuẩn trúng tuyển</label>
+      <input type="number" id="cfg-pass" value="15" min="0" max="30" step="0.25" oninput="saveCfg(); refreshStats()">
+    </div>
+    <div class="cfg-group">
+      <label>Hệ số Toán</label>
+      <input type="number" id="cfg-hs-toan" value="1" min="1" max="3" oninput="saveCfg(); redrawTotals()">
+    </div>
+    <div class="cfg-group">
+      <label>Hệ số Văn</label>
+      <input type="number" id="cfg-hs-van" value="1" min="1" max="3" oninput="saveCfg(); redrawTotals()">
+    </div>
+    <div class="cfg-group">
+      <label>Hệ số Ngoại Ngữ</label>
+      <input type="number" id="cfg-hs-nn" value="1" min="1" max="3" oninput="saveCfg(); redrawTotals()">
+    </div>
+  </div>
+</div>
+
+<!-- Bảng nhập -->
+<div class="card">
+  <h2>Danh sách thí sinh</h2>
+  <div class="toolbar">
+    <button class="btn-green" onclick="addRow()">+ Thêm thí sinh</button>
+    <button class="btn-blue"  onclick="addRows10()">+ Thêm 10 dòng</button>
+    <button class="btn-gold"  onclick="generate()">&#128229; Tạo data.js</button>
+    <button class="btn-blue"  onclick="downloadFile()">&#11015; Tải data.js</button>
+    <button class="btn-gray"  onclick="clearAll()">&#128465; Xóa tất cả</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+  <br>
+
+  <div class="tbl-wrap">
+    <table id="tbl">
+      <thead>
+        <tr>
+          <th class="col-num">#</th>
+          <th style="min-width:90px">Số báo danh</th>
+          <th style="min-width:200px">Họ và tên</th>
+          <th style="min-width:110px">Ngày sinh</th>
+          <th style="min-width:70px">Toán</th>
+          <th style="min-width:70px">Ngữ Văn</th>
+          <th style="min-width:80px">Ngoại Ngữ</th>
+          <th style="min-width:70px">Tổng</th>
+          <th class="col-del"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Output -->
+<div class="card" id="out-wrap">
+  <h2>Nội dung file data.js &nbsp;<span style="font-weight:400;color:var(--muted);font-size:0.82rem">(copy & paste vào file data.js, hoặc dùng nút Tải data.js)</span></h2>
+  <textarea id="output" readonly></textarea>
+  <div class="hint">
+    &#128161; Sao chép toàn bộ nội dung trên và dán vào file <strong>data.js</strong> trong thư mục website, rồi lưu lại.<br>
+    Hoặc nhấn nút <strong>Tải data.js</strong> để tải file về trực tiếp.
+  </div>
+</div>
+
+</main>
+
+<script>
+// ── State ─────────────────────────────────────────────────────
+let rows = [];
+let nextId = 1;
+
+function saveCfg() {
+    localStorage.setItem('adminCfg', JSON.stringify({
+        school: v('cfg-school'),
+        year:   v('cfg-year'),
+        pass:   v('cfg-pass'),
+        hsToan: v('cfg-hs-toan'),
+        hsVan:  v('cfg-hs-van'),
+        hsNn:   v('cfg-hs-nn'),
+    }));
+}
+function loadCfg() {
+    const c = JSON.parse(localStorage.getItem('adminCfg') || 'null');
+    if (!c) return;
+    set('cfg-school', c.school);
+    set('cfg-year',   c.year);
+    set('cfg-pass',   c.pass);
+    set('cfg-hs-toan', c.hsToan);
+    set('cfg-hs-van',  c.hsVan);
+    set('cfg-hs-nn',   c.hsNn);
+}
+function v(id)       { return document.getElementById(id).value; }
+function set(id, val){ if(val !== undefined) document.getElementById(id).value = val; }
+function n(id)       { return parseFloat(v(id)) || 0; }
+
+// ── Load saved data ───────────────────────────────────────────
+function loadData() {
+    const saved = localStorage.getItem('adminRows');
+    if (saved) {
+        rows = JSON.parse(saved);
+        nextId = rows.length ? Math.max(...rows.map(r => r._id)) + 1 : 1;
+        rows.forEach(r => appendRowEl(r));
+    }
+    refreshStats();
+}
+function saveData() {
+    rows = collectRows();
+    localStorage.setItem('adminRows', JSON.stringify(rows));
+}
+
+// ── Row management ────────────────────────────────────────────
+function addRow(data) {
+    const id = nextId++;
+    const r = data || { _id: id, sbd:'', hoTen:'', ngaySinh:'', toan:'', van:'', ngoaiNgu:'' };
+    if (!data) { r._id = id; rows.push(r); saveData(); }
+    appendRowEl(r);
+    refreshStats();
+}
+function addRows10() {
+    for (let i = 0; i < 10; i++) addRow();
+}
+
+function appendRowEl(r) {
+    const tbody = document.getElementById('tbody');
+    const tr = document.createElement('tr');
+    tr.dataset.id = r._id;
+    tr.innerHTML = `
+      <td class="col-num">${tbody.children.length + 1}</td>
+      <td><input type="text" value="${r.sbd}"      placeholder="001001" onchange="onChange(this)" data-f="sbd"     tabindex="1"></td>
+      <td><input type="text" value="${r.hoTen}"    placeholder="Nguyễn Văn A"    onchange="onChange(this)" data-f="hoTen"   tabindex="1"></td>
+      <td><input type="text" value="${r.ngaySinh}" placeholder="15/03/2011"      onchange="onChange(this)" data-f="ngaySinh" tabindex="1"></td>
+      <td><input type="text" value="${r.toan}"     placeholder="0.0" oninput="onScore(this)" data-f="toan"     tabindex="1"></td>
+      <td><input type="text" value="${r.van}"      placeholder="0.0" oninput="onScore(this)" data-f="van"      tabindex="1"></td>
+      <td><input type="text" value="${r.ngoaiNgu}" placeholder="0.0" oninput="onScore(this)" data-f="ngoaiNgu" tabindex="1"></td>
+      <td class="total-cell" data-total></td>
+      <td class="col-del"><button class="del-btn" onclick="delRow(${r._id})" title="Xóa">✕</button></td>`;
+    tbody.appendChild(tr);
+    updateTotal(tr);
+}
+
+function onChange(inp) { saveData(); refreshStats(); }
+function onScore(inp) {
+    updateTotal(inp.closest('tr'));
+    saveData();
+    refreshStats();
+}
+
+function updateTotal(tr) {
+    const get = f => parseFloat(tr.querySelector(`[data-f="${f}"]`).value) || 0;
+    const t = get('toan') * n('cfg-hs-toan') +
+              get('van')  * n('cfg-hs-van')  +
+              get('ngoaiNgu') * n('cfg-hs-nn');
+    tr.querySelector('[data-total]').textContent = t ? t.toFixed(1) : '—';
+}
+function redrawTotals() {
+    document.querySelectorAll('#tbody tr').forEach(updateTotal);
+    refreshStats();
+}
+
+function delRow(id) {
+    const tr = document.querySelector(`#tbody tr[data-id="${id}"]`);
+    if (tr) tr.remove();
+    renumber();
+    saveData();
+    refreshStats();
+}
+function renumber() {
+    document.querySelectorAll('#tbody tr').forEach((tr, i) => {
+        tr.cells[0].textContent = i + 1;
+    });
+}
+function clearAll() {
+    if (!confirm('Xóa toàn bộ dữ liệu đã nhập?')) return;
+    document.getElementById('tbody').innerHTML = '';
+    rows = [];
+    saveData();
+    refreshStats();
+}
+
+// ── Collect ───────────────────────────────────────────────────
+function collectRows() {
+    return Array.from(document.querySelectorAll('#tbody tr')).map(tr => ({
+        _id:      parseInt(tr.dataset.id),
+        sbd:      tr.querySelector('[data-f=sbd]').value.trim(),
+        hoTen:    tr.querySelector('[data-f=hoTen]').value.trim(),
+        ngaySinh: tr.querySelector('[data-f=ngaySinh]').value.trim(),
+        toan:     tr.querySelector('[data-f=toan]').value.trim(),
+        van:      tr.querySelector('[data-f=van]').value.trim(),
+        ngoaiNgu: tr.querySelector('[data-f=ngoaiNgu]').value.trim(),
+    }));
+}
+
+function refreshStats() {
+    const data = collectRows().filter(r => r.sbd || r.hoTen);
+    const pass = parseFloat(v('cfg-pass')) || 0;
+    const ht   = n('cfg-hs-toan'), hv = n('cfg-hs-van'), hn = n('cfg-hs-nn');
+    let nPass = 0, nFail = 0;
+    data.forEach(r => {
+        const t = (parseFloat(r.toan)||0)*ht + (parseFloat(r.van)||0)*hv + (parseFloat(r.ngoaiNgu)||0)*hn;
+        if (t >= pass) nPass++; else nFail++;
+    });
+    document.getElementById('stats').innerHTML = `
+      <span>Tổng: <strong>${data.length}</strong> thí sinh</span>
+      <span style="color:var(--green)">Trúng tuyển: <strong>${nPass}</strong></span>
+      <span style="color:var(--red)">Không trúng tuyển: <strong>${nFail}</strong></span>`;
+}
+
+// ── Generate ──────────────────────────────────────────────────
+function buildDataJs(data) {
+    const lines = data.map(r => {
+        const sbd  = r.sbd      ? `"${r.sbd}"` : '""';
+        const name = r.hoTen    ? `"${r.hoTen}"` : '""';
+        const dob  = r.ngaySinh ? `"${r.ngaySinh}"` : '""';
+        const t    = r.toan     ? parseFloat(r.toan)     : 'null';
+        const v2   = r.van      ? parseFloat(r.van)      : 'null';
+        const nn   = r.ngoaiNgu ? parseFloat(r.ngoaiNgu) : 'null';
+        return `    { sbd: ${sbd.padEnd(10)}, hoTen: ${name.padEnd(30)}, ngaySinh: ${dob.padEnd(14)}, toan: ${String(t).padEnd(5)}, van: ${String(v2).padEnd(5)}, ngoaiNgu: ${nn} }`;
+    });
+
+    return `// =============================================================
+//  DATA.JS — Điểm thi tuyển sinh vào lớp 10
+//  Tạo tự động từ admin.html · ${new Date().toLocaleString('vi-VN')}
+// =============================================================
+
+const SCHOOL_NAME = "${v('cfg-school')}";
+const SCHOOL_YEAR = "${v('cfg-year')}";
+const PASS_SCORE  = ${v('cfg-pass')};
+const HE_SO = {
+    toan:     ${n('cfg-hs-toan')},
+    van:      ${n('cfg-hs-van')},
+    ngoaiNgu: ${n('cfg-hs-nn')},
+};
+
+const STUDENTS = [
+${lines.join(',\n')}
+];
+`;
+}
+
+function generate() {
+    const data = collectRows().filter(r => r.sbd || r.hoTen);
+    if (!data.length) { alert('Chưa có dữ liệu để tạo file!'); return; }
+    const js = buildDataJs(data);
+    document.getElementById('output').value = js;
+    document.getElementById('out-wrap').style.display = 'block';
+    document.getElementById('out-wrap').scrollIntoView({ behavior: 'smooth' });
+    flash('Đã tạo data.js thành công!');
+}
+
+function downloadFile() {
+    const data = collectRows().filter(r => r.sbd || r.hoTen);
+    if (!data.length) { alert('Chưa có dữ liệu để tải!'); return; }
+    const js   = buildDataJs(data);
+    const blob = new Blob([js], { type: 'text/javascript;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href = url; a.download = 'data.js';
+    a.click();
+    URL.revokeObjectURL(url);
+    flash('Đã tải data.js!');
+}
+
+function flash(msg) {
+    const el = document.createElement('div');
+    el.className = 'flash';
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2500);
+}
+
+// ── Init ──────────────────────────────────────────────────────
+loadCfg();
+loadData();
+if (!rows.length) addRows10();
+</script>
+</body>
+</html>

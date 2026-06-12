@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s \"https://thanhnien.vn/api/get-data-tuyen-sinh.htm?keywords=123&pageindex=1&size=10&type=3&token=FAKE\" -H \"User-Agent: Mozilla/5.0\" -H \"Referer: https://thanhnien.vn/\")",
+      "Bash(curl -s \"https://thanhnien.vn/api/get-data-tuyen-sinh.htm?keywords=123&pageindex=1&size=10&type=3\" -H \"User-Agent: Mozilla/5.0\" -H \"Referer: https://thanhnien.vn/\")"
+    ]
+  }
+}

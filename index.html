@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tra Cứu Điểm Thi Vào Lớp 10</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --navy:       #003774;
+    --navy-dark:  #002558;
+    --navy-light: #0d59ae;
+    --red-brand:  #F58220;
+    --red-dark:   #d96d10;
+    --green:      #1e8449;
+    --red-fail:   #c0392b;
+    --bg:         #f4f6fa;
+    --card:       #ffffff;
+    --text:       #252930;
+    --muted:      #717d7e;
+    --border:     #dde1e9;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+    color: white;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+}
+header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+/* ── NAVBAR ── */
+.navbar {
+    background: var(--red-brand);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 56px;
+    gap: 1rem;
+}
+.navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+    color: white;
+    flex-shrink: 0;
+}
+.navbar-brand img {
+    height: 36px;
+    width: auto;
+}
+.navbar-brand-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: white;
+}
+.navbar-brand-sub {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    font-weight: 400;
+}
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    height: 100%;
+}
+.header-nav a {
+    color: rgba(255,255,255,0.85);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0 1.1rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    border-left: 1px solid rgba(255,255,255,0.1);
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+.header-nav a:last-child { border-right: 1px solid rgba(255,255,255,0.1); }
+.header-nav a:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* ── HERO (nhỏ gọn) ── */
+.hero {
+    background: var(--red-brand);
+    color: white;
+    text-align: center;
+    padding: 1.4rem 1rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+.hero h1 {
+    font-size: clamp(1.2rem, 3.5vw, 1.7rem);
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+    position: relative;
+}
+.hero .subtitle {
+    font-size: 0.88rem;
+    opacity: 0.82;
+    position: relative;
+}
+
+@media (max-width: 600px) {
+    .navbar { padding: 0 1rem; }
+    .navbar-brand-name { display: none; }
+    .header-nav a .nav-icon { font-size: 1rem; }
+    .header-nav a .nav-label { display: none; }
+    .header-nav a { padding: 0 0.8rem; }
+}
+
+/* ── MAIN ── */
+main {
+    max-width: 780px;
+    margin: 2rem auto 3rem;
+    padding: 0 1rem;
+}
+
+/* ── CARD ── */
+.card {
+    background: var(--card);
+    border-radius: 18px;
+    padding: 2rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    margin-bottom: 1.5rem;
+}
+.card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 1.5rem;
+}
+.card-title-bar {
+    width: 4px; height: 20px;
+    background: var(--red-brand);
+    border-radius: 2px;
+}
+
+/* ── TABS ── */
+.tabs {
+    display: flex;
+    gap: 0.4rem;
+    background: var(--bg);
+    padding: 0.3rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+.tab-btn {
+    flex: 1;
+    padding: 0.65rem 0.8rem;
+    border: none;
+    background: transparent;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.2s;
+    font-family: inherit;
+}
+.tab-btn.active {
+    background: white;
+    color: var(--navy);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── REQUIRED BADGE ── */
+.required { color: var(--red-brand); margin-left: 2px; }
+.input-hint { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+
+/* ── DATE PICKER ── */
+.date-picker {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.3fr;
+    gap: 0.5rem;
+}
+.date-picker select {
+    width: 100%;
+    padding: 0.8rem 0.7rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--text);
+    background: white;
+    cursor: pointer;
+    outline: none;
+    font-family: inherit;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23717d7e' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.7rem center;
+    padding-right: 2rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.date-picker select:focus {
+    border-color: var(--navy-light);
+    box-shadow: 0 0 0 3px rgba(13,89,174,0.12);
+}
+.date-picker select.error { border-color: var(--red-brand) !important; }
+input.error { border-color: var(--red-brand) !important; }
+.shake { animation: shake 0.35s ease; }
+@keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60%  { transform: translateX(-6px); }
+    40%,80%  { transform: translateX(6px); }
+}
+
+/* ── TOAST ── */
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2c3e50;
+    color: white;
+    padding: 1rem 1.8rem;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 999;
+    animation: toastIn 0.2s ease;
+    text-align: center;
+}
+.toast.warn { border-left: 4px solid var(--red-brand); }
+@keyframes toastIn {
+    from { opacity: 0; transform: translate(-50%, -46%); }
+    to   { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* ── FORM ── */
+.form-group { margin-bottom: 1rem; }
+label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 0.4rem;
+}
+input[type=text] {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    color: var(--text);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    font-family: inherit;
+}
+input[type=text]:focus {
+    border-color: var(--navy-light);
+    box-shadow: 0 0 0 3px rgba(13,89,174,0.12);
+}
+.row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+@media (max-width: 480px) { .row-2 { grid-template-columns: 1fr; } }
+
+.btn-primary {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--red-brand);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: transform 0.1s, box-shadow 0.2s, background 0.15s;
+    margin-top: 0.5rem;
+    font-family: inherit;
+}
+.btn-primary:hover { background: var(--red-dark); box-shadow: 0 4px 16px rgba(254,43,37,0.35); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+/* ── RESULT CARD ── */
+.result-card {
+    background: var(--card);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+    margin-bottom: 1rem;
+    animation: fadeUp 0.3s ease;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.result-head {
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+    color: white;
+    padding: 1.3rem 1.6rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.result-head .name { font-size: 1.2rem; font-weight: 800; margin-bottom: 0.2rem; }
+.result-head .meta { font-size: 0.82rem; opacity: 0.8; }
+.badge {
+    padding: 0.4rem 1.1rem;
+    border-radius: 30px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+.badge-pass { background: var(--green);    color: white; }
+.badge-fail { background: var(--red-fail); color: white; }
+
+.result-body { padding: 1.5rem; }
+.info-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.88rem;
+    color: var(--muted);
+    margin-bottom: 1.3rem;
+}
+
+/* ── SCORE GRID ── */
+.scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; margin-bottom: 1.2rem; }
+@media (max-width: 400px) { .scores { grid-template-columns: 1fr 1fr; } }
+.score-box {
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 1rem 0.8rem;
+    text-align: center;
+}
+.score-subject {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+}
+.score-val {
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.2rem;
+}
+.score-val.s-high   { color: var(--green); }
+.score-val.s-mid    { color: #d68910; }
+.score-val.s-low    { color: var(--red-fail); }
+.score-val.s-none   { color: var(--muted); font-size: 1.5rem; }
+.score-max { font-size: 0.72rem; color: var(--muted); }
+
+.total-row {
+    border-top: 2px solid var(--border);
+    padding-top: 1rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+.total-label { font-weight: 700; color: var(--muted); font-size: 0.9rem; }
+.total-val { font-size: 2rem; font-weight: 900; color: var(--navy); }
+.total-max { font-size: 0.9rem; font-weight: 400; color: var(--muted); margin-left: 0.3rem; }
+
+/* ── LIST (nhiều kết quả) ── */
+.list-card {
+    background: var(--card);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    animation: fadeUp 0.3s ease;
+}
+.list-header {
+    padding: 0.9rem 1.5rem;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.83rem;
+    color: var(--muted);
+    font-weight: 600;
+}
+.list-item {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.list-item:last-child { border-bottom: none; }
+.list-item:hover { background: var(--bg); }
+.list-item .li-name { font-weight: 700; margin-bottom: 0.2rem; }
+.list-item .li-meta { font-size: 0.82rem; color: var(--muted); }
+.list-item .li-arrow { color: var(--navy-light); font-size: 0.85rem; }
+
+/* ── NOT FOUND ── */
+.empty {
+    text-align: center;
+    padding: 3.5rem 2rem;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    animation: fadeUp 0.3s ease;
+}
+.empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+.empty h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
+.empty p { color: var(--muted); font-size: 0.9rem; }
+
+/* ── LOADING ── */
+.loading {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    animation: fadeUp 0.2s ease;
+    color: var(--muted);
+}
+.spinner {
+    width: 40px; height: 40px;
+    border: 4px solid var(--border);
+    border-top-color: var(--navy-light);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── FOOTER ── */
+footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--muted);
+    font-size: 0.83rem;
+    line-height: 1.7;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="navbar">
+    <a class="navbar-brand" href="https://www.viendong.edu.vn/" target="_blank">
+      <img src="LogoVD.ico" alt="Logo Viễn Đông" onerror="this.style.display='none'">
+      <div>
+        <div class="navbar-brand-name" id="hdr-school"></div>
+        <div class="navbar-brand-sub">viendong.edu.vn</div>
+      </div>
+    </a>
+    <div class="header-nav">
+      <a href="https://www.viendong.edu.vn/" target="_blank">
+        <span class="nav-icon">🏠</span><span class="nav-label">Trang chủ</span>
+      </a>
+      <a href="https://www.viendong.edu.vn/g1-gioi-thieu.html" target="_blank">
+        <span class="nav-icon">📖</span><span class="nav-label">Giới thiệu</span>
+      </a>
+      <a href="https://www.viendong.edu.vn/ho-tro-sinh-vien.html" target="_blank">
+        <span class="nav-icon">🎓</span><span class="nav-label">Hỗ trợ sinh viên</span>
+      </a>
+    </div>
+  </nav>
+  <div class="hero">
+    <h1>TRA CỨU ĐIỂM THI TUYỂN SINH</h1>
+    <div class="subtitle">Năm học <span id="hdr-year"></span></div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="card-title">
+      <div class="card-title-bar"></div>
+      Tra cứu kết quả thi
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('lop10', this)">📋 Tuyển sinh lớp 10</button>
+      <button class="tab-btn"        onclick="switchTab('thpt',  this)">🎓 Tốt nghiệp THPT</button>
+    </div>
+
+    <!-- Tab Lớp 10: SBD + họ tên + ngày sinh -->
+    <div id="tab-lop10" class="tab-panel active">
+      <div class="form-group">
+        <label>Số báo danh <span class="required">*</span></label>
+        <input type="text" id="l10-sbd" placeholder="Ví dụ: 001001" onkeydown="onEnter(event)" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Họ và tên thí sinh <span class="required">*</span></label>
+        <input type="text" id="l10-ten" placeholder="Ví dụ: Nguyễn Văn An" onkeydown="onEnter(event)" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Ngày sinh <span class="required">*</span></label>
+        <div class="date-picker">
+          <select id="dob-day">
+            <option value="">Ngày</option>
+          </select>
+          <select id="dob-month">
+            <option value="">Tháng</option>
+          </select>
+          <select id="dob-year">
+            <option value="">Năm</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="search()">Tra cứu điểm thi</button>
+    </div>
+
+    <!-- Tab THPT: chỉ cần SBD -->
+    <div id="tab-thpt" class="tab-panel">
+      <div class="form-group">
+        <label>Số báo danh <span class="required">*</span></label>
+        <input type="text" id="thpt-sbd" placeholder="Ví dụ: 12001001" onkeydown="onEnter(event)" autocomplete="off">
+      </div>
+      <button class="btn-primary" onclick="search()">Tra cứu điểm thi</button>
+    </div>
+  </div>
+
+  <div id="results"></div>
+</main>
+
+<footer>
+  <p id="footer-school"></p>
+  <p>Kết quả chính thức công bố ngày 14&ndash;15/06/2026</p>
+  <p>Mọi thắc mắc xin liên hệ văn phòng nhà trường</p>
+</footer>
+
+<script>
+// ── Cấu hình ─────────────────────────────────────────────────
+const SCHOOL_NAME = "Cao Đẳng Viễn Đông";
+const SCHOOL_YEAR = "2026 – 2027";
+const PASS_SCORE  = 15; // cập nhật khi có điểm chuẩn chính thức
+
+// ── Thanh Niên API ────────────────────────────────────────────
+// Token không được validate phía server — không cần quản lý
+const API_LOP10 = "https://thanhnien.vn/api/diem-thi-lop-10.htm";
+const API_THPT  = "https://thanhnien.vn/api/get-data-tuyen-sinh.htm";
+
+// ── Init ─────────────────────────────────────────────────────
+document.getElementById('hdr-year').textContent      = SCHOOL_YEAR;
+document.getElementById('hdr-school').textContent    = SCHOOL_NAME;
+document.getElementById('footer-school').textContent = '© 2026 ' + SCHOOL_NAME;
+
+// ── Tabs ─────────────────────────────────────────────────────
+let currentTab = 'lop10';
+function switchTab(name, btn) {
+    currentTab = name;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-lop10').classList.toggle('active', name === 'lop10');
+    document.getElementById('tab-thpt').classList.toggle('active',  name === 'thpt');
+    document.getElementById('results').innerHTML = '';
+}
+
+// ── Helpers UI ───────────────────────────────────────────────
+function onEnter(e) { if (e.key === 'Enter') search(); }
+
+let _toastTimer = null;
+function showToast(msg) {
+    const old = document.querySelector('.toast');
+    if (old) old.remove();
+    const el = document.createElement('div');
+    el.className = 'toast warn';
+    el.innerHTML = `⚠️ ${msg}`;
+    document.body.appendChild(el);
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => el.remove(), 3000);
+}
+
+function shakeInvalid(ids) {
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.add('error', 'shake');
+        el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+        el.addEventListener('input',        () => el.classList.remove('error'), { once: true });
+        el.addEventListener('change',       () => el.classList.remove('error'), { once: true });
+    });
+}
+
+// ── Populate date dropdowns ───────────────────────────────────
+(function () {
+    const dayEl   = document.getElementById('dob-day');
+    const monEl   = document.getElementById('dob-month');
+    const yearEl  = document.getElementById('dob-year');
+    const months  = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
+                     'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+
+    for (let d = 1; d <= 31; d++) {
+        dayEl.add(new Option(d, String(d).padStart(2,'0')));
+    }
+    months.forEach((m, i) => {
+        monEl.add(new Option(m, String(i+1).padStart(2,'0')));
+    });
+    for (let y = 2015; y >= 2005; y--) {
+        const opt = new Option(y, y);
+        if (y === 2011) opt.selected = true;
+        yearEl.add(opt);
+    }
+})();
+
+function dateToApi() {
+    const d = document.getElementById('dob-day').value;
+    const m = document.getElementById('dob-month').value;
+    const y = document.getElementById('dob-year').value;
+    if (!d || !m || !y) return '';
+    return `${d}/${m}/${y}`;
+}
+
+// ── Map field names từ API Thanh Niên sang format nội bộ ──────
+// Nếu sau ngày 14/6 thấy kết quả trả về sai, mở DevTools xem
+// tên field thực tế trong data[] rồi cập nhật hàm này.
+function normalize(raw) {
+    const f = (keys) => {
+        for (const k of keys) if (raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k];
+        return null;
+    };
+    const score = (keys) => {
+        const v = f(keys);
+        if (v === null) return null;
+        const n = parseFloat(String(v).replace(',', '.'));
+        return isNaN(n) ? null : n;
+    };
+    return {
+        sbd:      f(['sbd','so_bao_danh','sobaodan','keywords']) || '',
+        hoTen:    f(['hoten','ho_ten','fullname','name','ten'])   || '',
+        ngaySinh: f(['ngaysinh','ngay_sinh','birthday','dob'])    || '',
+        toan:     score(['toan','diem_toan','mon_toan']),
+        van:      score(['van','ngu_van','nguvan','diem_van']),
+        ngoaiNgu: score(['ngoaingu','ngoai_ngu','ngoai_ngu','diem_ngoaingu','nn']),
+        tongDiem: score(['tong','tong_diem','tongdiem','total']),
+    };
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function calcTotal(s) {
+    return (s.tongDiem !== null ? s.tongDiem : null)
+        ?? ((s.toan || 0) + (s.van || 0) + (s.ngoaiNgu || 0));
+}
+function fmtScore(v) {
+    if (v === null || v === undefined) return null;
+    const n = parseFloat(v);
+    return isNaN(n) ? String(v) : n.toFixed(1);
+}
+function scoreClass(v) {
+    if (v === null || v === undefined) return 's-none';
+    if (v >= 8) return 's-high';
+    if (v >= 5) return 's-mid';
+    return 's-low';
+}
+
+// ── Render ────────────────────────────────────────────────────
+function renderScore(label, val) {
+    const fs = fmtScore(val);
+    return `
+    <div class="score-box">
+      <div class="score-subject">${label}</div>
+      <div class="score-val ${scoreClass(val)}">${fs !== null ? fs : '—'}</div>
+      <div class="score-max">/ 10</div>
+    </div>`;
+}
+
+function renderCard(s) {
+    const total = calcTotal(s);
+    const pass  = total !== null && total >= PASS_SCORE;
+    const totalStr = total !== null ? total.toFixed(1) : '—';
+    return `
+    <div class="result-card">
+      <div class="result-head">
+        <div>
+          <div class="name">${s.hoTen || '—'}</div>
+          <div class="meta">Số báo danh: <strong>${s.sbd || '—'}</strong></div>
+        </div>
+        <div class="badge ${pass ? 'badge-pass' : 'badge-fail'}">
+          ${pass ? '✔ TRÚNG TUYỂN' : '✘ KHÔNG TRÚNG TUYỂN'}
+        </div>
+      </div>
+      <div class="result-body">
+        <div class="info-row">
+          <span>📅 Ngày sinh: <strong>${s.ngaySinh || '—'}</strong></span>
+        </div>
+        <div class="scores">
+          ${renderScore('Toán',      s.toan)}
+          ${renderScore('Ngữ Văn',   s.van)}
+          ${renderScore('Ngoại Ngữ', s.ngoaiNgu)}
+        </div>
+        <div class="total-row">
+          <span class="total-label">Tổng điểm</span>
+          <span>
+            <span class="total-val">${totalStr}</span>
+            <span class="total-max">/ 30</span>
+          </span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderList(arr) {
+    const items = arr.map((s, i) => `
+      <div class="list-item" onclick="showOne(${i})">
+        <div>
+          <div class="li-name">${s.hoTen}</div>
+          <div class="li-meta">SBD: ${s.sbd} &nbsp;·&nbsp; Ngày sinh: ${s.ngaySinh}</div>
+        </div>
+        <span class="li-arrow">Xem điểm →</span>
+      </div>`).join('');
+    return `
+    <div class="list-card">
+      <div class="list-header">Tìm thấy ${arr.length} kết quả — chọn thí sinh để xem điểm</div>
+      ${items}
+    </div>`;
+}
+
+function renderEmpty() {
+    return `
+    <div class="empty">
+      <div class="empty-icon">🔍</div>
+      <h3>Không tìm thấy kết quả</h3>
+      <p>Vui lòng kiểm tra lại số báo danh, họ tên và ngày sinh rồi thử lại.</p>
+    </div>`;
+}
+
+function renderError() {
+    return `
+    <div class="empty">
+      <div class="empty-icon">⚠️</div>
+      <h3>Không thể kết nối</h3>
+      <p>Vui lòng kiểm tra kết nối mạng và thử lại.</p>
+    </div>`;
+}
+
+function renderLoading() {
+    return `<div class="loading"><div class="spinner"></div>Đang tra cứu…</div>`;
+}
+
+// ── Lưu kết quả để showOne() dùng ────────────────────────────
+let _lastResults = [];
+
+// ── Search ────────────────────────────────────────────────────
+async function search() {
+    const el = document.getElementById('results');
+    let url, params;
+
+    if (currentTab === 'lop10') {
+        const sbd = document.getElementById('l10-sbd').value.trim();
+        const ten = document.getElementById('l10-ten').value.trim();
+        const dob = dateToApi();
+        const invalid = [];
+        if (!sbd) invalid.push('l10-sbd');
+        if (!ten) invalid.push('l10-ten');
+        if (!dob) {
+            ['dob-day','dob-month','dob-year'].forEach(id => {
+                if (!document.getElementById(id).value) invalid.push(id);
+            });
+        }
+        if (invalid.length) { shakeInvalid(invalid); showToast('Vui lòng nhập đầy đủ số báo danh, họ tên và ngày sinh!'); return; }
+        url    = API_LOP10;
+        params = new URLSearchParams({ keywords: sbd, name: ten, birthday: dob, sitename: 'thanhnien' });
+    } else {
+        const sbd = document.getElementById('thpt-sbd').value.trim();
+        if (!sbd) { shakeInvalid(['thpt-sbd']); showToast('Vui lòng nhập số báo danh!'); return; }
+        url    = API_THPT;
+        params = new URLSearchParams({ keywords: sbd, pageindex: 1, size: 10, type: 3 });
+    }
+
+    try {
+        const res  = await fetch(`${url}?${params}`);
+        const json = await res.json();
+
+        if (!json.success || !json.data || json.data.length === 0) {
+            el.innerHTML = renderEmpty();
+            return;
+        }
+
+        _lastResults = json.data.map(normalize);
+
+        if (_lastResults.length === 1) {
+            el.innerHTML = renderCard(_lastResults[0]);
+        } else {
+            el.innerHTML = renderList(_lastResults);
+        }
+    } catch (err) {
+        el.innerHTML = renderError();
+    }
+}
+
+function showOne(idx) {
+    const s = _lastResults[idx];
+    if (s) document.getElementById('results').innerHTML = renderCard(s);
+}
+</script>
+</body>
+</html>
