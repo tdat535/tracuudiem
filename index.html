@@ -297,7 +297,7 @@ input[type=text]:focus {
     to   { opacity: 1; transform: translateY(0); }
 }
 .result-head {
-    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+    background: var(--red-brand);
     color: white;
     padding: 1.3rem 1.6rem;
     display: flex;
@@ -352,9 +352,9 @@ input[type=text]:focus {
     line-height: 1;
     margin-bottom: 0.2rem;
 }
-.score-val.s-high   { color: var(--green); }
-.score-val.s-mid    { color: #d68910; }
-.score-val.s-low    { color: var(--red-fail); }
+.score-val.s-high   { color: var(--text); }
+.score-val.s-mid    { color: var(--text); }
+.score-val.s-low    { color: var(--text); }
 .score-val.s-none   { color: var(--muted); font-size: 1.5rem; }
 .score-max { font-size: 0.72rem; color: var(--muted); }
 
@@ -670,9 +670,6 @@ function renderCard(s) {
         <div>
           <div class="name">${s.hoTen || '—'}</div>
           <div class="meta">Số báo danh: <strong>${s.sbd || '—'}</strong></div>
-        </div>
-        <div class="badge ${pass ? 'badge-pass' : 'badge-fail'}">
-          ${pass ? '✔ TRÚNG TUYỂN' : '✘ KHÔNG TRÚNG TUYỂN'}
         </div>
       </div>
       <div class="result-body">
