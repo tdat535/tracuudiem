@@ -751,12 +751,12 @@ async function search() {
         }
         if (invalid.length) { shakeInvalid(invalid); showToast('Vui lòng nhập đầy đủ số báo danh, họ tên và ngày sinh!'); return; }
         url    = API_LOP10;
-        params = new URLSearchParams({ keywords: sbd, name: ten, birthday: dob, sitename: 'thanhnien', _endpoint: 'lop10' });
+        params = new URLSearchParams({ keywords: sbd, name: ten, birthday: dob, sitename: 'thanhnien' });
     } else {
         const sbd = document.getElementById('thpt-sbd').value.trim();
         if (!sbd) { shakeInvalid(['thpt-sbd']); showToast('Vui lòng nhập số báo danh!'); return; }
         url    = API_THPT;
-        params = new URLSearchParams({ keywords: sbd, pageindex: 1, size: 10, type: 3, _endpoint: 'thpt' });
+        params = new URLSearchParams({ keywords: sbd, pageindex: 1, size: 10, type: 3 });
     }
 
     try {
