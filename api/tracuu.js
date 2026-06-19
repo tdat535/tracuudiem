@@ -10,11 +10,16 @@ function httpsRequest(urlStr, options = {}) {
             method: options.method || 'GET',
             headers: options.headers || {},
         }, (resp) => {
+            const cookies = resp.headers['set-cookie'] || [];
             let data = '';
             resp.on('data', chunk => data += chunk);
             resp.on('end', () => {
-                try { resolve(JSON.parse(data)); }
-                catch { resolve({ _raw: data.substring(0, 500), _status: resp.statusCode }); }
+                try {
+                    const json = JSON.parse(data);
+                    resolve({ json, cookies });
+                } catch {
+                    resolve({ json: { _raw: data.substring(0, 500), _status: resp.statusCode }, cookies });
+                }
             });
         });
         req.on('error', reject);
@@ -37,38 +42,40 @@ export default async function handler(req, res) {
 
     try {
         if (endpoint === 'captcha') {
-            const data = await httpsRequest('https://diemthi.hcm.edu.vn/api/captcha', {
+            const { json, cookies } = await httpsRequest('https://diemthi.hcm.edu.vn/api/captcha', {
                 headers: {
                     'Referer': 'https://diemthi.hcm.edu.vn/',
                     'User-Agent': UA
                 }
             });
-            return res.status(200).json(data);
+            json._cookies = cookies.map(c => c.split(';')[0]).join('; ');
+            return res.status(200).json(json);
         }
 
         if (endpoint === 'hcm') {
-            const { captchaAnswer, captchaToken, soBaoDanh } = req.body;
-            const data = await httpsRequest('https://diemthi.hcm.edu.vn/api/search', {
+            const { captchaAnswer, captchaToken, soBaoDanh, _cookies } = req.body;
+            const { json } = await httpsRequest('https://diemthi.hcm.edu.vn/api/search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Referer': 'https://diemthi.hcm.edu.vn/',
-                    'User-Agent': UA
+                    'User-Agent': UA,
+                    'Cookie': _cookies || ''
                 },
                 body: JSON.stringify({ captchaAnswer, captchaToken, soBaoDanh })
             });
-            return res.status(200).json(data);
+            return res.status(200).json(json);
         }
 
         const params = new URLSearchParams(req.query);
         params.delete('_endpoint');
-        const data = await httpsRequest('https://thanhnien.vn/api/get-data-tuyen-sinh.htm?' + params.toString(), {
+        const { json } = await httpsRequest('https://thanhnien.vn/api/get-data-tuyen-sinh.htm?' + params.toString(), {
             headers: {
                 'Referer': 'https://thanhnien.vn/',
                 'User-Agent': UA
             }
         });
-        return res.status(200).json(data);
+        return res.status(200).json(json);
     } catch (err) {
         res.status(500).json({ success: false, error: err.message || 'proxy_error' });
     }

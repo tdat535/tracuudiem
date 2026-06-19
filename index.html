@@ -611,11 +611,13 @@ function shakeInvalid(ids) {
 
 // ── Captcha ──────────────────────────────────────────────────
 let _captchaToken = '';
+let _captchaCookies = '';
 
 async function loadCaptcha() {
     const box = document.getElementById('captcha-img');
     box.innerHTML = 'Đang tải…';
     _captchaToken = '';
+    _captchaCookies = '';
     try {
         const res  = await fetch(API_CAPTCHA);
         const json = await res.json();
@@ -625,6 +627,7 @@ async function loadCaptcha() {
             box.innerHTML = 'Lỗi tải captcha';
         }
         _captchaToken = json.token || '';
+        _captchaCookies = json._cookies || '';
     } catch {
         box.innerHTML = 'Lỗi tải captcha';
     }
@@ -780,7 +783,8 @@ async function search() {
                     _endpoint: 'hcm',
                     captchaAnswer: captcha,
                     captchaToken: _captchaToken,
-                    soBaoDanh: sbd
+                    soBaoDanh: sbd,
+                    _cookies: _captchaCookies
                 })
             });
             const json = await res.json();
