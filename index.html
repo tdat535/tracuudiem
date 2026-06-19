@@ -620,7 +620,7 @@ async function loadCaptcha() {
         const res  = await fetch(API_CAPTCHA);
         const json = await res.json();
         if (json.svg) {
-            box.innerHTML = atob(json.svg);
+            box.innerHTML = `<img src="${json.svg}" alt="captcha" style="max-height:48px">`;
         } else {
             box.innerHTML = 'Lỗi tải captcha';
         }
