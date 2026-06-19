@@ -413,6 +413,47 @@ input[type=text]:focus {
 .empty h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
 .empty p { color: var(--muted); font-size: 0.9rem; }
 
+/* ── CAPTCHA ── */
+.captcha-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.captcha-box {
+    flex: 1;
+    min-height: 54px;
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 0.3rem 0.6rem;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+.captcha-box svg { max-height: 48px; width: auto; }
+.captcha-reload {
+    width: 44px; height: 44px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, background 0.15s;
+    flex-shrink: 0;
+    font-family: inherit;
+    color: var(--navy-light);
+}
+.captcha-reload:hover {
+    border-color: var(--navy-light);
+    background: var(--bg);
+}
+
 /* ── LOADING ── */
 .loading {
     text-align: center;
@@ -481,29 +522,19 @@ footer {
       <button class="tab-btn"        onclick="switchTab('thpt',  this)">🎓 Tốt nghiệp THPT</button>
     </div>
 
-    <!-- Tab Lớp 10: SBD + họ tên + ngày sinh -->
+    <!-- Tab Lớp 10: SBD + captcha -->
     <div id="tab-lop10" class="tab-panel active">
       <div class="form-group">
         <label>Số báo danh <span class="required">*</span></label>
-        <input type="text" id="l10-sbd" placeholder="Ví dụ: 001001" onkeydown="onEnter(event)" autocomplete="off">
+        <input type="text" id="l10-sbd" placeholder="Ví dụ: 292241" onkeydown="onEnter(event)" autocomplete="off">
       </div>
       <div class="form-group">
-        <label>Họ và tên thí sinh <span class="required">*</span></label>
-        <input type="text" id="l10-ten" placeholder="Ví dụ: Nguyễn Văn An" onkeydown="onEnter(event)" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label>Ngày sinh <span class="required">*</span></label>
-        <div class="date-picker">
-          <select id="dob-day">
-            <option value="">Ngày</option>
-          </select>
-          <select id="dob-month">
-            <option value="">Tháng</option>
-          </select>
-          <select id="dob-year">
-            <option value="">Năm</option>
-          </select>
+        <label>Mã xác nhận <span class="required">*</span></label>
+        <div class="captcha-row">
+          <div id="captcha-img" class="captcha-box">Đang tải…</div>
+          <button type="button" class="captcha-reload" onclick="loadCaptcha()" title="Tải lại captcha">↻</button>
         </div>
+        <input type="text" id="l10-captcha" placeholder="Nhập mã xác nhận ở trên" onkeydown="onEnter(event)" autocomplete="off" style="margin-top:0.5rem">
       </div>
       <button class="btn-primary" onclick="search()">Tra cứu điểm thi</button>
     </div>
@@ -533,9 +564,10 @@ const SCHOOL_NAME = "Cao Đẳng Viễn Đông";
 const SCHOOL_YEAR = "2026 – 2027";
 const PASS_SCORE  = 15; // cập nhật khi có điểm chuẩn chính thức
 
-// ── API proxy (Vercel serverless — thêm Referer header phía server) ──
-const API_LOP10 = "/api/tracuu";
-const API_THPT  = "/api/tracuu";
+// ── API proxy (Vercel serverless) ──
+const API_BASE    = "/api/tracuu";
+const API_CAPTCHA = "/api/tracuu?_endpoint=captcha";
+const API_THPT    = "/api/tracuu";
 
 // ── Init ─────────────────────────────────────────────────────
 document.getElementById('hdr-school').textContent    = SCHOOL_NAME;
@@ -550,6 +582,7 @@ function switchTab(name, btn) {
     document.getElementById('tab-lop10').classList.toggle('active', name === 'lop10');
     document.getElementById('tab-thpt').classList.toggle('active',  name === 'thpt');
     document.getElementById('results').innerHTML = '';
+    if (name === 'lop10') loadCaptcha();
 }
 
 // ── Helpers UI ───────────────────────────────────────────────
@@ -577,34 +610,28 @@ function shakeInvalid(ids) {
     });
 }
 
-// ── Populate date dropdowns ───────────────────────────────────
-(function () {
-    const dayEl   = document.getElementById('dob-day');
-    const monEl   = document.getElementById('dob-month');
-    const yearEl  = document.getElementById('dob-year');
-    const months  = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
-                     'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+// ── Captcha ──────────────────────────────────────────────────
+let _captchaToken = '';
 
-    for (let d = 1; d <= 31; d++) {
-        dayEl.add(new Option(d, String(d).padStart(2,'0')));
+async function loadCaptcha() {
+    const box = document.getElementById('captcha-img');
+    box.innerHTML = 'Đang tải…';
+    _captchaToken = '';
+    try {
+        const res  = await fetch(API_CAPTCHA);
+        const json = await res.json();
+        if (json.svg) {
+            box.innerHTML = atob(json.svg);
+        } else {
+            box.innerHTML = 'Lỗi tải captcha';
+        }
+        _captchaToken = json.token || '';
+    } catch {
+        box.innerHTML = 'Lỗi tải captcha';
     }
-    months.forEach((m, i) => {
-        monEl.add(new Option(m, String(i+1).padStart(2,'0')));
-    });
-    for (let y = 2015; y >= 2005; y--) {
-        const opt = new Option(y, y);
-        if (y === 2011) opt.selected = true;
-        yearEl.add(opt);
-    }
-})();
-
-function dateToApi() {
-    const d = document.getElementById('dob-day').value;
-    const m = document.getElementById('dob-month').value;
-    const y = document.getElementById('dob-year').value;
-    if (!d || !m || !y) return '';
-    return `${d}/${m}/${y}`;
 }
+
+loadCaptcha();
 
 // ── Map field names từ API Thanh Niên sang format nội bộ ──────
 // Nếu sau ngày 14/6 thấy kết quả trả về sai, mở DevTools xem
@@ -621,13 +648,13 @@ function normalize(raw) {
         return isNaN(n) ? null : n;
     };
     return {
-        sbd:      f(['sbd','so_bao_danh','sobaodan','keywords']) || '',
-        hoTen:    f(['hoten','ho_ten','fullname','name','ten'])   || '',
-        ngaySinh: f(['ngaysinh','ngay_sinh','birthday','dob'])    || '',
-        toan:     score(['toan','diem_toan','mon_toan']),
-        van:      score(['van','ngu_van','nguvan','diem_van']),
-        ngoaiNgu: score(['ngoaingu','ngoai_ngu','ngoai_ngu','diem_ngoaingu','nn']),
-        tongDiem: score(['tong','tong_diem','tongdiem','total']),
+        sbd:      f(['soBaoDanh','sbd','so_bao_danh','sobaodan','keywords']) || '',
+        hoTen:    f(['hoTen','hoten','ho_ten','fullname','name','ten'])   || '',
+        ngaySinh: f(['ngaySinh','ngaysinh','ngay_sinh','birthday','dob'])    || '',
+        toan:     score(['toan','diemToan','diem_toan','mon_toan']),
+        van:      score(['van','nguVan','ngu_van','nguvan','diem_van']),
+        ngoaiNgu: score(['ngoaiNgu','ngoaingu','ngoai_ngu','diem_ngoaingu','nn']),
+        tongDiem: score(['tongDiem','tong','tong_diem','tongdiem','total']),
     };
 }
 
@@ -735,48 +762,82 @@ let _lastResults = [];
 // ── Search ────────────────────────────────────────────────────
 async function search() {
     const el = document.getElementById('results');
-    let url, params;
 
     if (currentTab === 'lop10') {
-        const sbd = document.getElementById('l10-sbd').value.trim();
-        const ten = document.getElementById('l10-ten').value.trim();
-        const dob = dateToApi();
+        const sbd     = document.getElementById('l10-sbd').value.trim();
+        const captcha = document.getElementById('l10-captcha').value.trim();
         const invalid = [];
-        if (!sbd) invalid.push('l10-sbd');
-        if (!ten) invalid.push('l10-ten');
-        if (!dob) {
-            ['dob-day','dob-month','dob-year'].forEach(id => {
-                if (!document.getElementById(id).value) invalid.push(id);
+        if (!sbd)     invalid.push('l10-sbd');
+        if (!captcha) invalid.push('l10-captcha');
+        if (invalid.length) { shakeInvalid(invalid); showToast('Vui lòng nhập số báo danh và mã xác nhận!'); return; }
+        if (!_captchaToken) { showToast('Captcha chưa tải xong, vui lòng thử lại!'); return; }
+
+        el.innerHTML = renderLoading();
+        try {
+            const res = await fetch(API_BASE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    _endpoint: 'hcm',
+                    captchaAnswer: captcha,
+                    captchaToken: _captchaToken,
+                    soBaoDanh: sbd
+                })
             });
+            const json = await res.json();
+
+            if (json.error) {
+                showToast(json.error);
+                loadCaptcha();
+                el.innerHTML = renderEmpty();
+                return;
+            }
+
+            if (!json.data && !json.hoTen && !json.hoten) {
+                el.innerHTML = renderEmpty();
+                loadCaptcha();
+                return;
+            }
+
+            const raw = json.data || json;
+            const arr = Array.isArray(raw) ? raw : [raw];
+            _lastResults = arr.map(normalize);
+
+            if (_lastResults.length === 1) {
+                el.innerHTML = renderCard(_lastResults[0]);
+            } else {
+                el.innerHTML = renderList(_lastResults);
+            }
+            loadCaptcha();
+        } catch (err) {
+            el.innerHTML = renderError();
+            loadCaptcha();
         }
-        if (invalid.length) { shakeInvalid(invalid); showToast('Vui lòng nhập đầy đủ số báo danh, họ tên và ngày sinh!'); return; }
-        url    = API_LOP10;
-        params = new URLSearchParams({ keywords: sbd, name: ten, birthday: dob, sitename: 'thanhnien' });
     } else {
         const sbd = document.getElementById('thpt-sbd').value.trim();
         if (!sbd) { shakeInvalid(['thpt-sbd']); showToast('Vui lòng nhập số báo danh!'); return; }
-        url    = API_THPT;
-        params = new URLSearchParams({ keywords: sbd, pageindex: 1, size: 10, type: 3 });
-    }
 
-    try {
-        const res  = await fetch(`${url}?${params}`);
-        const json = await res.json();
+        const params = new URLSearchParams({ keywords: sbd, pageindex: 1, size: 10, type: 3 });
+        el.innerHTML = renderLoading();
+        try {
+            const res  = await fetch(`${API_THPT}?${params}`);
+            const json = await res.json();
 
-        if (!json.success || !json.data || json.data.length === 0) {
-            el.innerHTML = renderEmpty();
-            return;
+            if (!json.success || !json.data || json.data.length === 0) {
+                el.innerHTML = renderEmpty();
+                return;
+            }
+
+            _lastResults = json.data.map(normalize);
+
+            if (_lastResults.length === 1) {
+                el.innerHTML = renderCard(_lastResults[0]);
+            } else {
+                el.innerHTML = renderList(_lastResults);
+            }
+        } catch (err) {
+            el.innerHTML = renderError();
         }
-
-        _lastResults = json.data.map(normalize);
-
-        if (_lastResults.length === 1) {
-            el.innerHTML = renderCard(_lastResults[0]);
-        } else {
-            el.innerHTML = renderList(_lastResults);
-        }
-    } catch (err) {
-        el.innerHTML = renderError();
     }
 }
 
