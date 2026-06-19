@@ -356,6 +356,10 @@ input[type=text]:focus {
 .score-val.s-mid    { color: var(--text); }
 .score-val.s-low    { color: var(--text); }
 .score-val.s-none   { color: var(--muted); font-size: 1.5rem; }
+.score-box.clr-toan    .score-val { color: #2471a3; }
+.score-box.clr-van     .score-val { color: #922b21; }
+.score-box.clr-nn      .score-val { color: #1e8449; }
+.score-box.clr-chuyen  .score-val { color: #7d3c98; }
 .score-max { font-size: 0.72rem; color: var(--muted); }
 
 .total-row {
@@ -668,7 +672,7 @@ function calcTotal(s) {
 function fmtScore(v) {
     if (v === null || v === undefined) return null;
     const n = parseFloat(v);
-    return isNaN(n) ? String(v) : n.toFixed(1);
+    return isNaN(n) ? String(v) : String(n);
 }
 function scoreClass(v) {
     if (v === null || v === undefined) return 's-none';
@@ -678,10 +682,10 @@ function scoreClass(v) {
 }
 
 // ── Render ────────────────────────────────────────────────────
-function renderScore(label, val) {
+function renderScore(label, val, clr) {
     const fs = fmtScore(val);
     return `
-    <div class="score-box">
+    <div class="score-box ${clr || ''}">
       <div class="score-subject">${label}</div>
       <div class="score-val ${scoreClass(val)}">${fs !== null ? fs : '—'}</div>
       <div class="score-max">/ 10</div>
@@ -692,7 +696,7 @@ function renderCard(s) {
     const total = calcTotal(s);
     const pass  = total !== null && total >= PASS_SCORE;
     const totalStr = total !== null ? total.toFixed(1) : '—';
-    const chuyenHtml = s.monChuyen !== null ? renderScore('Môn Chuyên', s.monChuyen) : '';
+    const chuyenHtml = s.monChuyen !== null ? renderScore('Môn Chuyên', s.monChuyen, 'clr-chuyen') : '';
     return `
     <div class="result-card">
       <div class="result-head">
@@ -707,9 +711,9 @@ function renderCard(s) {
           ${s.ngaySinh ? `<span>📅 Ngày sinh: <strong>${s.ngaySinh}</strong></span>` : ''}
         </div>
         <div class="scores">
-          ${renderScore('Toán',      s.toan)}
-          ${renderScore('Ngữ Văn',   s.van)}
-          ${renderScore('Ngoại Ngữ', s.ngoaiNgu)}
+          ${renderScore('Toán',      s.toan,      'clr-toan')}
+          ${renderScore('Ngữ Văn',   s.van,       'clr-van')}
+          ${renderScore('Ngoại Ngữ', s.ngoaiNgu,  'clr-nn')}
           ${chuyenHtml}
         </div>
       </div>
