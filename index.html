@@ -635,28 +635,28 @@ async function loadCaptcha() {
 
 loadCaptcha();
 
-// ── Map field names từ API Thanh Niên sang format nội bộ ──────
-// Nếu sau ngày 14/6 thấy kết quả trả về sai, mở DevTools xem
-// tên field thực tế trong data[] rồi cập nhật hàm này.
 function normalize(raw) {
-    const f = (keys) => {
-        for (const k of keys) if (raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k];
+    const kq = raw.ketQua || raw;
+    const f = (obj, keys) => {
+        for (const k of keys) if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
         return null;
     };
-    const score = (keys) => {
-        const v = f(keys);
+    const score = (obj, keys) => {
+        const v = f(obj, keys);
         if (v === null) return null;
         const n = parseFloat(String(v).replace(',', '.'));
         return isNaN(n) ? null : n;
     };
     return {
-        sbd:      f(['soBaoDanh','sbd','so_bao_danh','sobaodan','keywords']) || '',
-        hoTen:    f(['hoTen','hoten','ho_ten','fullname','name','ten'])   || '',
-        ngaySinh: f(['ngaySinh','ngaysinh','ngay_sinh','birthday','dob'])    || '',
-        toan:     score(['toan','diemToan','diem_toan','mon_toan']),
-        van:      score(['van','nguVan','ngu_van','nguvan','diem_van']),
-        ngoaiNgu: score(['ngoaiNgu','ngoaingu','ngoai_ngu','diem_ngoaingu','nn']),
-        tongDiem: score(['tongDiem','tong','tong_diem','tongdiem','total']),
+        sbd:       f(raw, ['soBaoDanh','sbd','so_bao_danh','keywords']) || '',
+        hoTen:     f(raw, ['hoTen','hoten','ho_ten','fullname','name','ten']) || '',
+        ngaySinh:  f(raw, ['ngaySinh','ngaysinh','ngay_sinh','birthday','dob']) || '',
+        hoiDong:   f(raw, ['TenHoiDong','tenHoiDong','hoi_dong']) || '',
+        toan:      score(kq, ['toan','diemToan','diem_toan','mon_toan']),
+        van:       score(kq, ['van','nguVan','ngu_van','nguvan','diem_van']),
+        ngoaiNgu:  score(kq, ['anh','ngoaiNgu','ngoaingu','ngoai_ngu','nn']),
+        monChuyen: score(kq, ['MonChuyen','monChuyen','mon_chuyen']),
+        tongDiem:  score(kq, ['tongDiem','tong','tong_diem','tongdiem','total']),
     };
 }
 
@@ -692,29 +692,25 @@ function renderCard(s) {
     const total = calcTotal(s);
     const pass  = total !== null && total >= PASS_SCORE;
     const totalStr = total !== null ? total.toFixed(1) : '—';
+    const chuyenHtml = s.monChuyen !== null ? renderScore('Môn Chuyên', s.monChuyen) : '';
     return `
     <div class="result-card">
       <div class="result-head">
         <div>
-          <div class="name">${s.hoTen || '—'}</div>
+          <div class="name">${s.hoTen || 'Thí sinh'}</div>
           <div class="meta">Số báo danh: <strong>${s.sbd || '—'}</strong></div>
         </div>
       </div>
       <div class="result-body">
         <div class="info-row">
-          <span>📅 Ngày sinh: <strong>${s.ngaySinh || '—'}</strong></span>
+          ${s.hoiDong ? `<span>🏫 Hội đồng: <strong>${s.hoiDong}</strong></span>` : ''}
+          ${s.ngaySinh ? `<span>📅 Ngày sinh: <strong>${s.ngaySinh}</strong></span>` : ''}
         </div>
         <div class="scores">
           ${renderScore('Toán',      s.toan)}
           ${renderScore('Ngữ Văn',   s.van)}
           ${renderScore('Ngoại Ngữ', s.ngoaiNgu)}
-        </div>
-        <div class="total-row">
-          <span class="total-label">Tổng điểm</span>
-          <span>
-            <span class="total-val">${totalStr}</span>
-            <span class="total-max">/ 30</span>
-          </span>
+          ${chuyenHtml}
         </div>
       </div>
     </div>`;
