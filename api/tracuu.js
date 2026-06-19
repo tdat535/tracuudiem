@@ -1,8 +1,12 @@
 import https from 'https';
 
-function httpsRequest(url, options = {}) {
+function httpsRequest(urlStr, options = {}) {
+    const url = new URL(urlStr);
     return new Promise((resolve, reject) => {
-        const req = https.request(url, {
+        const req = https.request({
+            hostname: url.hostname,
+            port: url.port || 443,
+            path: url.pathname + url.search,
             method: options.method || 'GET',
             headers: options.headers || {},
         }, (resp) => {
@@ -10,7 +14,7 @@ function httpsRequest(url, options = {}) {
             resp.on('data', chunk => data += chunk);
             resp.on('end', () => {
                 try { resolve(JSON.parse(data)); }
-                catch { resolve({ _raw: data }); }
+                catch { resolve({ _raw: data.substring(0, 500), _status: resp.statusCode }); }
             });
         });
         req.on('error', reject);
@@ -56,10 +60,9 @@ export default async function handler(req, res) {
             return res.status(200).json(data);
         }
 
-        // Legacy: THPT via thanhnien
         const params = new URLSearchParams(req.query);
         params.delete('_endpoint');
-        const data = await httpsRequest(`https://thanhnien.vn/api/get-data-tuyen-sinh.htm?${params}`, {
+        const data = await httpsRequest('https://thanhnien.vn/api/get-data-tuyen-sinh.htm?' + params.toString(), {
             headers: {
                 'Referer': 'https://thanhnien.vn/',
                 'User-Agent': UA
