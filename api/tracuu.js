@@ -1,3 +1,24 @@
+import https from 'https';
+
+function httpsRequest(url, options = {}) {
+    return new Promise((resolve, reject) => {
+        const req = https.request(url, {
+            method: options.method || 'GET',
+            headers: options.headers || {},
+        }, (resp) => {
+            let data = '';
+            resp.on('data', chunk => data += chunk);
+            resp.on('end', () => {
+                try { resolve(JSON.parse(data)); }
+                catch { resolve({ _raw: data }); }
+            });
+        });
+        req.on('error', reject);
+        if (options.body) req.write(options.body);
+        req.end();
+    });
+}
+
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -12,19 +33,18 @@ export default async function handler(req, res) {
 
     try {
         if (endpoint === 'captcha') {
-            const response = await fetch('https://diemthi.hcm.edu.vn/api/captcha', {
+            const data = await httpsRequest('https://diemthi.hcm.edu.vn/api/captcha', {
                 headers: {
                     'Referer': 'https://diemthi.hcm.edu.vn/',
                     'User-Agent': UA
                 }
             });
-            const data = await response.json();
             return res.status(200).json(data);
         }
 
         if (endpoint === 'hcm') {
             const { captchaAnswer, captchaToken, soBaoDanh } = req.body;
-            const response = await fetch('https://diemthi.hcm.edu.vn/api/search', {
+            const data = await httpsRequest('https://diemthi.hcm.edu.vn/api/search', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -33,22 +53,20 @@ export default async function handler(req, res) {
                 },
                 body: JSON.stringify({ captchaAnswer, captchaToken, soBaoDanh })
             });
-            const data = await response.json();
             return res.status(200).json(data);
         }
 
         // Legacy: THPT via thanhnien
         const params = new URLSearchParams(req.query);
         params.delete('_endpoint');
-        const response = await fetch(`https://thanhnien.vn/api/get-data-tuyen-sinh.htm?${params}`, {
+        const data = await httpsRequest(`https://thanhnien.vn/api/get-data-tuyen-sinh.htm?${params}`, {
             headers: {
                 'Referer': 'https://thanhnien.vn/',
                 'User-Agent': UA
             }
         });
-        const data = await response.json();
         return res.status(200).json(data);
     } catch (err) {
-        res.status(500).json({ success: false, error: 'proxy_error' });
+        res.status(500).json({ success: false, error: err.message || 'proxy_error' });
     }
 }
